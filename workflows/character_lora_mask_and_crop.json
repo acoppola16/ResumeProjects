@@ -1,0 +1,88 @@
+{
+  "last_node_id": 7,
+  "last_link_id": 6,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "LoadImage",
+      "name": "Load Image",
+      "inputs": {
+        "path": "input_images/*.png"
+      },
+      "outputs": {
+        "IMAGE": 0
+      }
+    },
+    {
+      "id": 2,
+      "type": "SegmentAnythingLoader",
+      "name": "Load SAM Model"
+    },
+    {
+      "id": 3,
+      "type": "SegmentAnything",
+      "name": "Segment Person",
+      "inputs": {
+        "image": [1, 0],
+        "model": [2, 0]
+      },
+      "outputs": {
+        "MASK": 0
+      }
+    },
+    {
+      "id": 4,
+      "type": "MaskImage",
+      "name": "Apply Mask",
+      "inputs": {
+        "image": [1, 0],
+        "mask": [3, 0]
+      },
+      "outputs": {
+        "IMAGE": 0
+      }
+    },
+    {
+      "id": 5,
+      "type": "SaveImage",
+      "name": "Save Masked Person",
+      "inputs": {
+        "image": [4, 0],
+        "filename_prefix": "masked/"
+      }
+    },
+    {
+      "id": 6,
+      "type": "CropToBBox",
+      "name": "Crop Shoulders",
+      "inputs": {
+        "image": [4, 0],
+        "mask": [3, 0],
+        "top_fraction": 0.6
+      },
+      "outputs": {
+        "IMAGE": 0
+      }
+    },
+    {
+      "id": 7,
+      "type": "SaveImage",
+      "name": "Save HeadShoulders",
+      "inputs": {
+        "image": [6, 0],
+        "filename_prefix": "head_shoulders/"
+      }
+    }
+  ],
+  "links": [
+    [1, 0, 3, 0],
+    [2, 0, 3, 1],
+    [3, 0, 4, 1],
+    [4, 0, 5, 0],
+    [4, 0, 6, 0],
+    [3, 0, 6, 1],
+    [6, 0, 7, 0]
+  ],
+  "groups": [],
+  "title": "Character Dataset Mask and Crop"
+}
